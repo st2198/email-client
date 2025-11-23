@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { Box, Chip, InputAdornment, TextField, Typography } from '@mui/material';
-import { Email as EmailIcon, Search as SearchIcon } from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
 import EmailCard from '@/components/EmailCard';
+import EmailContentPlaceholder from '@/components/EmailContentPlaceholder';
+import EmailContent from '@/components/EmailContent';
 import { Email } from '@/lib/schema';
 
 interface ClientPageProps {
@@ -14,6 +17,11 @@ export default function ClientPage(props: ClientPageProps) {
   console.log('emailList', emailList);
   const unreadCount = emailList.filter(email => !email.isRead).length;
   const importantCount = emailList.filter(email => email.isImportant).length;
+  const [selectedEmail, setSelectedEmail] = useState<Email | undefined>(undefined);
+
+  const onEmailClickHandler = (emailId: number) => {
+    setSelectedEmail(emailList.find(e => e.id === emailId))
+  }
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -85,7 +93,7 @@ export default function ClientPage(props: ClientPageProps) {
         }} data-testid="email-list">
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {emailList.map((email) => (
-              <EmailCard key={email.id} email={email} />
+              <EmailCard key={email.id} email={email} onClick={() => onEmailClickHandler(email.id)} />
             ))}
           </Box>
         </Box>
@@ -100,15 +108,7 @@ export default function ClientPage(props: ClientPageProps) {
         backgroundColor: 'background.default',
         p: 4,
       }} data-testid="email-content-panel">
-        <Box sx={{ textAlign: 'center' }}>
-          <EmailIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-            Select an email to view
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Choose an email from the list to see its content here
-          </Typography>
-        </Box>
+        {selectedEmail ? <EmailContent email={selectedEmail} /> : <EmailContentPlaceholder />}
       </Box>
     </Box>
   );

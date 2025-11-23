@@ -6,15 +6,11 @@ import {
   Box,
   Chip,
   Avatar,
-  Divider,
-  IconButton,
 } from '@mui/material';
 import {
   Star,
-  StarBorder,
-  MarkEmailRead,
-  MarkEmailUnread,
 } from '@mui/icons-material';
+import { getInitials, formatDate } from './utils';
 
 interface EmailProps {
   id: number;
@@ -29,23 +25,7 @@ interface EmailProps {
   updatedAt: Date;
 };
 
-const EmailCard: React.FC<{ email: EmailProps }> = ({ email }) => {
-  const getInitials = (name: string) => {
-    return name.split('@')[0].substring(0, 2).toUpperCase();
-  };
-
-  const formatDate = (date: Date) => {
-    const now = new Date();
-    const emailDate = new Date(date);
-    const diffInHours = (now.getTime() - emailDate.getTime()) / (1000 * 60 * 60);
-
-    if (diffInHours < 24) {
-      return emailDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else {
-      return emailDate.toLocaleDateString();
-    }
-  };
-
+const EmailCard: React.FC<{ email: EmailProps, onClick: () => void }> = ({ email, onClick }) => {
   return (
     <Card
       data-testid={`email-card-${email.id}`}
@@ -62,6 +42,7 @@ const EmailCard: React.FC<{ email: EmailProps }> = ({ email }) => {
           backgroundColor: 'action.hover',
         },
       }}
+      onClick={onClick}
     >
       <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
         {/* Compact Header */}
