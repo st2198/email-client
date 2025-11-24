@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import { EmailDirection } from "@/lib/schema";
 
 export interface NewEmailInput {
@@ -11,7 +10,7 @@ export interface NewEmailInput {
 
 export async function sendEmail(input: NewEmailInput) {
   const payload = {
-    threadId: nanoid(),
+    threadId: new Date().toString(),
     subject: input.subject,
     from: "me@example.com", // replace with actual user
     to: input.to,

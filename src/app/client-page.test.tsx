@@ -66,7 +66,9 @@ describe('Home Page Client', () => {
     });
 
     // In case debounce is implemented we want to wait for it
-    await new Promise((r) => setTimeout(r, 1_000));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 1_000));
+    });
 
     const matchingThreads = threads.filter(thread => thread.subject.includes(searchTerm));
     // const nonMatchingThreads = threads.filter(thread => !thread.subject.includes(searchTerm));
@@ -101,7 +103,9 @@ describe('Home Page Client', () => {
     let displayedEmails = screen.getAllByTestId(/email-card-/);
     expect(displayedEmails.length).toBe(emailList.length);
 
-    await new Promise((r) => setTimeout(r, 1_000));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 1_000));
+    });
 
     const matchingThreads = threads.filter(thread => thread.subject.includes(searchTerm));
     // const nonMatchingThreads = threads.filter(thread => !thread.subject.includes(searchTerm));
