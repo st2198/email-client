@@ -1,7 +1,7 @@
 "use server";
-import { eq, not } from "drizzle-orm";
+import { eq, or, like, desc } from "drizzle-orm";
 import { db } from '@/lib/database';
-import { EmailDirection, emails } from '@/lib/schema';
+import { EmailDirection, emails, Email } from '@/lib/schema';
 
 interface AddEmail {
   threadId: string;
@@ -27,7 +27,7 @@ export const addEmail = async ({
   direction,
   cc,
   bcc
-}: AddEmail) => {
+}: AddEmail): Promise<Email[]> => {
   return await db.insert(emails).values({
     threadId,
     subject,
@@ -42,10 +42,29 @@ export const addEmail = async ({
   }).returning();
 };
 
-export async function markEmailAsRead(id: number) {
+export const markEmailAsRead = async (id: number) => {
   await db.update(emails)
     .set({ isRead: true })
     .where(eq(emails.id, id));
 
   return true;
 }
+
+export const getAllEmails = async (search: string | null): Promise<Email[]> => {
+  if (!search) {
+    return await db.select().from(emails).orderBy(desc(emails.createdAt));
+  }
+
+  const lowerSearch = `%${search.toLowerCase()}%`;
+
+  return await db.select().from(emails).where(
+    or(
+      like(emails.subject, lowerSearch),
+      like(emails.to, lowerSearch),
+      like(emails.cc, lowerSearch),
+      like(emails.bcc, lowerSearch),
+      like(emails.content, lowerSearch)
+    )
+  );
+};
+

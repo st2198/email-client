@@ -1,11 +1,26 @@
 import { EmailDirection } from "@/lib/schema";
 
+const BASE_URL = 'http://localhost:3000';
+
 export interface NewEmailInput {
   to: string;
   cc?: string;
   bcc?: string;
   subject: string;
   content: string;
+}
+
+export async function getEmails() {
+  const res = await fetch(`${BASE_URL}/api/emails`, {
+    method: 'GET',
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch emails");
+  }
+
+  return res.json();
 }
 
 export async function sendEmail(input: NewEmailInput) {
@@ -22,7 +37,7 @@ export async function sendEmail(input: NewEmailInput) {
     direction: EmailDirection.OUTGOING,
   };
 
-  const res = await fetch("/api/emails", {
+  const res = await fetch(`${BASE_URL}/api/emails`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -36,7 +51,7 @@ export async function sendEmail(input: NewEmailInput) {
 }
 
 export async function markEmailAsRead(emailId: number) {
-    const res = await fetch("/api/emails", {
+    const res = await fetch(`${BASE_URL}/api/emails`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ emailId }),

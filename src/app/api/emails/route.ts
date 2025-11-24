@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { addEmail, markEmailAsRead } from './actions'
+import { addEmail, getAllEmails, markEmailAsRead } from './actions'
 
 export async function POST(req: NextRequest): Promise<Response> {
   const body = await req.json();
@@ -28,7 +28,11 @@ export async function POST(req: NextRequest): Promise<Response> {
 }
 
 export async function GET(req: NextRequest): Promise<Response> {
-  return Response.json({ status: 'error' }, { status: 400 });
+  const search = req.nextUrl.searchParams.get('search');
+
+  const emails = await getAllEmails(search);
+  
+  return Response.json(emails, { status: 200 });
 }
 
 export async function PUT(req: NextRequest): Promise<Response> {

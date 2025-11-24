@@ -8,10 +8,10 @@ import EmailContentPlaceholder from '@/components/EmailContentPlaceholder';
 import EmailContent from '@/components/EmailContent';
 import ComposeEmail from '@/components/ComposeEmail';
 import { Email } from '@/lib/schema';
-import { markEmailAsRead } from './api/emails/actions';
 import { debounce } from '@mui/material/utils';
 import { useFilter } from '@/contexts/FilterProvider';
 import { useComposeOpen } from '@/contexts/ComposeProvider';
+import { markEmailAsRead } from '@/services/emailService';
 
 interface ClientPageProps {
   emails: Email[];
