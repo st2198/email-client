@@ -74,6 +74,7 @@ export default function ClientPage(props: ClientPageProps) {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      {/* Left Panel - Email List */}
       <Box sx={{
         width: '400px',
         borderRight: '1px solid',
@@ -82,6 +83,7 @@ export default function ClientPage(props: ClientPageProps) {
         flexDirection: 'column',
         backgroundColor: 'background.paper',
       }}>
+        {/* Header */}
         <Box sx={{ p: 2, borderBottom: '1px solid', borderBottomColor: 'divider' }}>
           <Button variant="contained" onClick={() => setIsComposeOpen(true)}>
             Compose
@@ -89,7 +91,7 @@ export default function ClientPage(props: ClientPageProps) {
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
             Inbox
           </Typography>
-
+          {/* Stats */}
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <Chip
               label={`${emails.length} Total`}
@@ -112,6 +114,7 @@ export default function ClientPage(props: ClientPageProps) {
           </Box>
         </Box>
 
+        {/* Search Bar */}
         <Box sx={{ p: 2, borderBottom: '1px solid', borderBottomColor: 'divider' }}>
           <TextField
             fullWidth
@@ -135,6 +138,7 @@ export default function ClientPage(props: ClientPageProps) {
           />
         </Box>
 
+        {/* Email List - Scrollable */}
         <Box sx={{
           flex: 1,
           overflow: 'auto',
@@ -148,6 +152,7 @@ export default function ClientPage(props: ClientPageProps) {
         </Box>
       </Box>
 
+      {/* Right Panel - Email Content (Placeholder) */}
       <Box sx={{
         flex: 1,
         display: 'flex',
