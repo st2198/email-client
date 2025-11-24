@@ -91,6 +91,7 @@ export default function ClientPage(props: ClientPageProps) {
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
             Inbox
           </Typography>
+
           {/* Stats */}
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <Chip
