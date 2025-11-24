@@ -1,6 +1,7 @@
 import ThemeProvider from '../components/ThemeProvider';
 import LayoutInner from '../components/LayoutInner';
-import { FilterProvider } from '@/contexts/FilterContext';
+import { FilterProvider } from '@/contexts/FilterProvider';
+import { ComposeProvider } from '@/contexts/ComposeProvider';
 
 export const metadata = {
   title: 'Email Client',
@@ -16,9 +17,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ThemeProvider>
-          <FilterProvider>
-            <LayoutInner>{children}</LayoutInner>
-          </FilterProvider>
+          <ComposeProvider>
+            <FilterProvider>
+              <LayoutInner>{children}</LayoutInner>
+            </FilterProvider>
+          </ComposeProvider>
         </ThemeProvider>
       </body>
     </html>

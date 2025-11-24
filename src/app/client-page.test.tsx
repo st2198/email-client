@@ -1,16 +1,19 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import ClientPage from './client-page';
 import { threads } from '../../database/seed';
-import { FilterProvider } from '@/contexts/FilterContext';
+import { FilterProvider } from '@/contexts/FilterProvider';
+import { ComposeProvider } from '@/contexts/ComposeProvider';
 import { Email, emails } from '@/lib/schema';
 import { db } from '@/lib/database';
 import { desc } from 'drizzle-orm';
 
 const renderComponent = (emailList: Email[]) =>
   render(
-    <FilterProvider>
-      <ClientPage emails={emailList} />
-    </FilterProvider>
+    <ComposeProvider>
+      <FilterProvider>
+        <ClientPage emails={emailList} />
+      </FilterProvider>
+    </ComposeProvider>
   );
 
 describe('Home Page Client', () => {

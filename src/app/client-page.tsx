@@ -10,7 +10,8 @@ import ComposeEmail from '@/components/ComposeEmail';
 import { Email } from '@/lib/schema';
 import { markEmailAsRead } from './api/emails/actions';
 import { debounce } from '@mui/material/utils';
-import { useFilter } from '@/contexts/FilterContext';
+import { useFilter } from '@/contexts/FilterProvider';
+import { useComposeOpen } from '@/contexts/ComposeProvider';
 
 interface ClientPageProps {
   emails: Email[];
@@ -18,13 +19,13 @@ interface ClientPageProps {
 
 export default function ClientPage(props: ClientPageProps) {
   const { emails: emailList } = props;
-  const { filter, setFilter } = useFilter();
+  const { filter } = useFilter();
+  const { isComposeOpen, setIsComposeOpen } = useComposeOpen();
   const [searchTerm, setSearchTerm] = useState('');
 
   const unreadCount = emailList.filter(email => !email.isRead).length;
   const importantCount = emailList.filter(email => email.isImportant).length;
   const [selectedEmail, setSelectedEmail] = useState<Email | undefined>(undefined);
-  const [isComposeOpen, setIsComposeOpen] = useState(false);
 
   const filteredEmails = useMemo(() => {
     let filtered = emailList;
@@ -106,9 +107,6 @@ export default function ClientPage(props: ClientPageProps) {
       }}>
         {/* Header */}
         <Box sx={{ p: 2, borderBottom: '1px solid', borderBottomColor: 'divider' }}>
-          <Button variant="contained" fullWidth onClick={() => setIsComposeOpen(true)} sx={{ mb: 2 }}>
-            Compose
-          </Button>
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
             Inbox
           </Typography>

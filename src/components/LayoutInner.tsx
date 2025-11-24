@@ -1,13 +1,14 @@
 "use client";
 
 
-import { Box, Divider, MenuList, MenuItem, ListItemText, ListItemIcon, Typography, Paper } from '@mui/material';
+import { Box, Divider, MenuList, MenuItem, ListItemText, ListItemIcon, Typography, Paper, Button } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
 import InboxIcon from '@mui/icons-material/Inbox';
 import StarIcon from '@mui/icons-material/Star';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useFilter } from '@/contexts/FilterContext';
+import { useFilter } from '@/contexts/FilterProvider';
+import { useComposeOpen } from '@/contexts/ComposeProvider';
 
 export default function RootLayoutInner({
   children,
@@ -15,6 +16,7 @@ export default function RootLayoutInner({
   children: React.ReactNode
 }) {
   const { filter, setFilter } = useFilter();
+  const { setIsComposeOpen } = useComposeOpen();
   return <Box sx={{ display: 'flex', minHeight: '100vh' }}>
     {/* Sidebar */}
     <Paper
@@ -47,6 +49,15 @@ export default function RootLayoutInner({
       {/* Navigation */}
       <Box sx={{ flex: 1, p: 1 }}>
         <MenuList sx={{ p: 0 }}>
+          <MenuItem sx={{ borderRadius: 2, mb: 0.5 }} onClick={() => setIsComposeOpen(true)}>
+            <ListItemIcon sx={{ minWidth: 40 }}>
+              <EmailIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Compose"
+              primaryTypographyProps={{ fontWeight: 500 }}
+            />
+          </MenuItem>
           <MenuItem selected={filter === 'inbox'} sx={{ borderRadius: 2, mb: 0.5 }} onClick={() => setFilter('inbox')}>
             <ListItemIcon sx={{ minWidth: 40 }}>
               <InboxIcon fontSize="small" />
