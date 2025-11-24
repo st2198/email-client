@@ -30,8 +30,21 @@ export async function sendEmail(input: NewEmailInput) {
   });
 
   if (!res.ok) {
-    console.error(await res.text());
     throw new Error("Failed to send email");
+  }
+
+  return res.json();
+}
+
+export async function markEmailAsRead(emailId: number) {
+    const res = await fetch("/api/emails", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ emailId }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to mark email as read");
   }
 
   return res.json();
