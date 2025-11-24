@@ -8,7 +8,7 @@ import { desc } from 'drizzle-orm';
 describe('Home Page Client', () => {
   test('Shows the email list in the inbox', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
+    const ui = <ClientPage emails={emailList} initialSearch='' />;
     render(ui);
 
     // Wait for the email list to load first
@@ -22,7 +22,7 @@ describe('Home Page Client', () => {
 
   test('Displays the email content truncated to 30 characters', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
+    const ui = <ClientPage emails={emailList} initialSearch='' />;
     render(ui);
 
     // Wait for the email list to load first
@@ -36,7 +36,7 @@ describe('Home Page Client', () => {
 
   test('Displays full email content when clicking on an email', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
+    const ui = <ClientPage emails={emailList} initialSearch='' />;
     render(ui);
 
     // Wait for the email list to load first
@@ -52,7 +52,7 @@ describe('Home Page Client', () => {
 
   test('The search feature works as expected', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
+    const ui = <ClientPage emails={emailList} initialSearch='' />;
     render(ui);
 
     // Wait for the email list to load first
@@ -83,14 +83,13 @@ describe('Home Page Client', () => {
   });
 
   test('The search feature is debounced and works as expected', async () => {
+    const searchTerm = threads[0].subject;
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
+    const ui = <ClientPage emails={emailList} initialSearch={searchTerm} />;
     render(ui);
 
     // Wait for the email list to load first
     await screen.findByTestId('email-list');
-
-    const searchTerm = threads[0].subject;
 
     const searchInput = screen.getByPlaceholderText('Search emails...');
     await act(async () => {
