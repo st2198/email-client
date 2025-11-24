@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Chip, InputAdornment, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, InputAdornment, TextField, Typography, Tabs, Tab } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import EmailCard from '@/components/EmailCard';
 import EmailContentPlaceholder from '@/components/EmailContentPlaceholder';
@@ -10,6 +10,8 @@ import ComposeEmail from '@/components/ComposeEmail';
 import { Email } from '@/lib/schema';
 import { markEmailAsRead } from './api/emails/actions';
 import { debounce } from '@mui/material/utils';
+import { useFilter } from '@/contexts/FilterProvider';
+import { useComposeOpen } from '@/contexts/ComposeProvider';
 
 interface ClientPageProps {
   emails: Email[];
@@ -17,36 +19,56 @@ interface ClientPageProps {
 
 export default function ClientPage(props: ClientPageProps) {
   const { emails: emailList } = props;
-  const [emails, setEmails] = useState<Email[]>([]);
+  const { filter } = useFilter();
+  const { isComposeOpen, setIsComposeOpen } = useComposeOpen();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const unreadCount = emails.filter(email => !email.isRead).length;
-  const importantCount = emails.filter(email => email.isImportant).length;
+  const unreadCount = emailList.filter(email => !email.isRead).length;
+  const importantCount = emailList.filter(email => email.isImportant).length;
   const [selectedEmail, setSelectedEmail] = useState<Email | undefined>(undefined);
-  const [isComposeOpen, setIsComposeOpen] = useState(false);
 
+  const filteredEmails = useMemo(() => {
+    let filtered = emailList;
+
+    switch (filter) {
+      case 'inbox':
+        filtered = emailList;
+        break;
+      case 'important':
+        filtered = emailList.filter(email => email.isImportant);
+        break;
+      case 'sent':
+        filtered = emailList.filter(email => email.direction === 'outgoing');
+        break;
+      default:
+        filtered = emailList;
+    }
+
+    if (searchTerm.trim()) {
+      const lower = searchTerm.toLowerCase();
+      filtered = filtered.filter(email =>
+        email.subject.toLowerCase().includes(lower) ||
+        email.to?.toLowerCase().includes(lower) ||
+        email.cc?.toLowerCase().includes(lower) ||
+        email.bcc?.toLowerCase().includes(lower) ||
+        email.content?.toLowerCase().includes(lower)
+      );
+    }
+
+    return filtered;
+  }, [emailList, filter, searchTerm]);
+
+  const [emails, setEmails] = useState<Email[]>(filteredEmails);
   useEffect(() => {
-    setEmails(emailList);
-  }, [emailList]);
+    setEmails(filteredEmails);
+  }, [filteredEmails]);
 
   const debouncedSearch = useMemo(
     () =>
       debounce((term: string) => {
-        if (!term.trim()) {
-          setEmails(emailList);
-          return;
-        }
-        const lower = term.toLowerCase();
-        const filtered = emailList.filter(email =>
-          email.subject.toLowerCase().includes(lower) ||
-          email.to?.toLowerCase().includes(lower) ||
-          email.cc?.toLowerCase().includes(lower) ||
-          email.bcc?.toLowerCase().includes(lower) ||
-          email.content?.toLowerCase().includes(lower)
-        );
-        setEmails(filtered);
-      }, 500),
-    [emailList]
+        setSearchTerm(term);
+      }, 300),
+    []
   );
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,9 +107,6 @@ export default function ClientPage(props: ClientPageProps) {
       }}>
         {/* Header */}
         <Box sx={{ p: 2, borderBottom: '1px solid', borderBottomColor: 'divider' }}>
-          <Button variant="contained" onClick={() => setIsComposeOpen(true)}>
-            Compose
-          </Button>
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
             Inbox
           </Typography>
@@ -95,7 +114,7 @@ export default function ClientPage(props: ClientPageProps) {
           {/* Stats */}
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <Chip
-              label={`${emails.length} Total`}
+              label={`${emailList.length} Total`}
               size="small"
               color="primary"
               variant="outlined"
@@ -140,16 +159,22 @@ export default function ClientPage(props: ClientPageProps) {
         </Box>
 
         {/* Email List - Scrollable */}
-        <Box sx={{
-          flex: 1,
-          overflow: 'auto',
-          p: 1,
-        }} data-testid="email-list">
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {emails.map((email) => (
-              <EmailCard key={email.id} email={email} onClick={() => onEmailClickHandler(email.id)} />
-            ))}
-          </Box>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 1 }} data-testid="email-list">
+          {emails.length === 0 ? (
+            <Typography variant="body2" color="text.secondary" sx={{ p: 3, textAlign: 'center' }}>
+              No emails found in {filter}.
+            </Typography>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {emails.map((email) => (
+                <EmailCard
+                  key={email.id}
+                  email={email}
+                  onClick={() => onEmailClickHandler(email.id)}
+                />
+              ))}
+            </Box>
+          )}
         </Box>
       </Box>
 
@@ -164,10 +189,8 @@ export default function ClientPage(props: ClientPageProps) {
       }} data-testid="email-content-panel">
         {selectedEmail ? <EmailContent email={selectedEmail} /> : <EmailContentPlaceholder />}
       </Box>
-      <ComposeEmail
-        open={isComposeOpen}
-        onClose={() => setIsComposeOpen(false)}
-      />
+
+      <ComposeEmail open={isComposeOpen} onClose={() => setIsComposeOpen(false)} />
     </Box>
   );
 }

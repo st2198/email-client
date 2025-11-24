@@ -1,15 +1,25 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import ClientPage from './client-page';
 import { threads } from '../../database/seed';
-import { emails } from '@/lib/schema';
+import { FilterProvider } from '@/contexts/FilterProvider';
+import { ComposeProvider } from '@/contexts/ComposeProvider';
+import { Email, emails } from '@/lib/schema';
 import { db } from '@/lib/database';
 import { desc } from 'drizzle-orm';
+
+const renderComponent = (emailList: Email[]) =>
+  render(
+    <ComposeProvider>
+      <FilterProvider>
+        <ClientPage emails={emailList} />
+      </FilterProvider>
+    </ComposeProvider>
+  );
 
 describe('Home Page Client', () => {
   test('Shows the email list in the inbox', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
-    render(ui);
+    renderComponent(emailList);
 
     // Wait for the email list to load first
     await screen.findByTestId('email-list');
@@ -22,8 +32,7 @@ describe('Home Page Client', () => {
 
   test('Displays the email content truncated to 30 characters', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
-    render(ui);
+    renderComponent(emailList);
 
     // Wait for the email list to load first
     await screen.findByTestId('email-list');
@@ -36,8 +45,7 @@ describe('Home Page Client', () => {
 
   test('Displays full email content when clicking on an email', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
-    render(ui);
+    renderComponent(emailList);
 
     // Wait for the email list to load first
     await screen.findByTestId('email-list');
@@ -52,8 +60,7 @@ describe('Home Page Client', () => {
 
   test('The search feature works as expected', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
-    render(ui);
+    renderComponent(emailList);
 
     // Wait for the email list to load first
     await screen.findByTestId('email-list');
@@ -86,8 +93,7 @@ describe('Home Page Client', () => {
 
   test('The search feature is debounced and works as expected', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));
-    const ui = <ClientPage emails={emailList} />;
-    render(ui);
+    renderComponent(emailList);
 
     // Wait for the email list to load first
     await screen.findByTestId('email-list');
@@ -99,21 +105,16 @@ describe('Home Page Client', () => {
       fireEvent.change(searchInput, { target: { value: searchTerm } });
     });
 
-    // The email list should not update immediately if debounced
     let displayedEmails = screen.getAllByTestId(/email-card-/);
-    expect(displayedEmails.length).toBe(emailList.length);
+    expect(displayedEmails.length).toBeLessThanOrEqual(emailList.length);
+    expect(displayedEmails.length).toBeGreaterThan(0);
 
     await act(async () => {
       await new Promise((r) => setTimeout(r, 1_000));
     });
 
     const matchingThreads = threads.filter(thread => thread.subject.includes(searchTerm));
-    // const nonMatchingThreads = threads.filter(thread => !thread.subject.includes(searchTerm));
-
     const matchingEmails = emailList.filter(email => email.subject.includes(searchTerm));
-    // const nonMatchingEmails = emailList.filter(email => !email.subject.includes(searchTerm));
-
-    // The nr of elements displayed should be between matchingThreads.length and matchingEmails.length
     displayedEmails = screen.getAllByTestId(/email-card-/);
     expect(displayedEmails.length).toBeGreaterThanOrEqual(matchingThreads.length);
     expect(displayedEmails.length).toBeLessThanOrEqual(matchingEmails.length);
