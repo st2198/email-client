@@ -17,6 +17,8 @@ export const emails = sqliteTable('emails', {
   direction: text('direction').notNull().$type<EmailDirection>().default(EmailDirection.INCOMING),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()).notNull(),
+  cc: text('cc'),
+  bcc: text('bcc'),
 });
 
 export type Email = typeof emails.$inferSelect;

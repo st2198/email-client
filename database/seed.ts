@@ -16,6 +16,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-01'),
     updatedAt: new Date('2025-01-01'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 2,
@@ -29,6 +31,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-02'),
     updatedAt: new Date('2025-01-02'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 3,
@@ -42,6 +46,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-03'),
     updatedAt: new Date('2025-01-03'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 4,
@@ -55,6 +61,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-04'),
     updatedAt: new Date('2025-01-04'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 5,
@@ -68,6 +76,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-05'),
     updatedAt: new Date('2025-01-05'),
+    cc:'',
+    bcc: '',
   },
 
   // Thread 2: Client Communication (4 emails)
@@ -83,6 +93,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-06'),
     updatedAt: new Date('2025-01-06'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 7,
@@ -96,6 +108,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-07'),
     updatedAt: new Date('2025-01-07'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 8,
@@ -109,6 +123,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-08'),
     updatedAt: new Date('2025-01-08'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 9,
@@ -122,6 +138,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-09'),
     updatedAt: new Date('2025-01-09'),
+    cc:'',
+    bcc: '',
   },
 
   // Thread 3: Technical Discussion (4 emails)
@@ -137,6 +155,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-10'),
     updatedAt: new Date('2025-01-10'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 11,
@@ -150,6 +170,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-11'),
     updatedAt: new Date('2025-01-11'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 12,
@@ -163,6 +185,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-12'),
     updatedAt: new Date('2025-01-12'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 13,
@@ -176,6 +200,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-13'),
     updatedAt: new Date('2025-01-13'),
+    cc:'',
+    bcc: '',
   },
 
   // Thread 4: Marketing Campaign (3 emails)
@@ -191,6 +217,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-14'),
     updatedAt: new Date('2025-01-14'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 15,
@@ -204,6 +232,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-15'),
     updatedAt: new Date('2025-01-15'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 16,
@@ -217,6 +247,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-16'),
     updatedAt: new Date('2025-01-16'),
+    cc:'',
+    bcc: '',
   },
 
   // Thread 5: Personal Messages (4 emails)
@@ -232,6 +264,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-17'),
     updatedAt: new Date('2025-01-17'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 18,
@@ -245,6 +279,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-18'),
     updatedAt: new Date('2025-01-18'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 19,
@@ -258,6 +294,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-19'),
     updatedAt: new Date('2025-01-19'),
+    cc:'',
+    bcc: '',
   },
   {
     id: 20,
@@ -271,6 +309,8 @@ export const emailData: Email[] = [
     direction: EmailDirection.INCOMING,
     createdAt: new Date('2025-01-20'),
     updatedAt: new Date('2025-01-20'),
+    cc:'',
+    bcc: '',
   },
 ];
 

@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { Box, Chip, InputAdornment, TextField, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Button, Chip, InputAdornment, TextField, Typography } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import EmailCard from '@/components/EmailCard';
 import EmailContentPlaceholder from '@/components/EmailContentPlaceholder';
 import EmailContent from '@/components/EmailContent';
+import ComposeEmail from '@/components/ComposeEmail';
 import { Email } from '@/lib/schema';
+import { markEmailAsRead } from './api/emails/actions';
 
 interface ClientPageProps {
   emails: Email[];
@@ -14,14 +16,33 @@ interface ClientPageProps {
 
 export default function ClientPage(props: ClientPageProps) {
   const { emails: emailList } = props;
-  console.log('emailList', emailList);
-  const unreadCount = emailList.filter(email => !email.isRead).length;
-  const importantCount = emailList.filter(email => email.isImportant).length;
-  const [selectedEmail, setSelectedEmail] = useState<Email | undefined>(undefined);
+  const [emails, setEmails] = useState<Email[]>([]);
 
-  const onEmailClickHandler = (emailId: number) => {
-    setSelectedEmail(emailList.find(e => e.id === emailId))
-  }
+  const unreadCount = emails.filter(email => !email.isRead).length;
+  const importantCount = emails.filter(email => email.isImportant).length;
+  const [selectedEmail, setSelectedEmail] = useState<Email | undefined>(undefined);
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
+
+  useEffect(() => {
+    setEmails(emailList);
+  }, [emailList]);
+
+  const onEmailClickHandler = async (emailId: number) => {
+    let selected: Email | undefined;
+    await markEmailAsRead(emailId);
+
+    const updated = emails.map(e => {
+      if (e.id === emailId) {
+        selected = { ...e };
+        return { ...e, isRead: true };
+      }
+      return e;
+    });
+
+    setEmails(updated);
+
+    setSelectedEmail(selected);
+  };
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -36,6 +57,9 @@ export default function ClientPage(props: ClientPageProps) {
       }}>
         {/* Header */}
         <Box sx={{ p: 2, borderBottom: '1px solid', borderBottomColor: 'divider' }}>
+          <Button variant="contained" onClick={() => setIsComposeOpen(true)}>
+            Compose
+          </Button>
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
             Inbox
           </Typography>
@@ -43,7 +67,7 @@ export default function ClientPage(props: ClientPageProps) {
           {/* Stats */}
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <Chip
-              label={`${emailList.length} Total`}
+              label={`${emails.length} Total`}
               size="small"
               color="primary"
               variant="outlined"
@@ -92,7 +116,7 @@ export default function ClientPage(props: ClientPageProps) {
           p: 1,
         }} data-testid="email-list">
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {emailList.map((email) => (
+            {emails.map((email) => (
               <EmailCard key={email.id} email={email} onClick={() => onEmailClickHandler(email.id)} />
             ))}
           </Box>
@@ -110,6 +134,10 @@ export default function ClientPage(props: ClientPageProps) {
       }} data-testid="email-content-panel">
         {selectedEmail ? <EmailContent email={selectedEmail} /> : <EmailContentPlaceholder />}
       </Box>
+      <ComposeEmail
+        open={isComposeOpen}
+        onClose={() => setIsComposeOpen(false)}
+      />
     </Box>
   );
 }
