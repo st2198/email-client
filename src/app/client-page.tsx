@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Chip, InputAdornment, TextField, Typography, Tabs, Tab } from '@mui/material';
+import { Box, Chip, InputAdornment, TextField, Typography } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import EmailCard from '@/components/EmailCard';
 import EmailContentPlaceholder from '@/components/EmailContentPlaceholder';
@@ -17,51 +17,50 @@ interface ClientPageProps {
   emails: Email[];
 }
 
-export default function ClientPage(props: ClientPageProps) {
-  const { emails: emailList } = props;
+export default function ClientPage({ emails: emailList }: ClientPageProps) {
   const { filter } = useFilter();
   const { isComposeOpen, setIsComposeOpen } = useComposeOpen();
+  const [emails, setEmails] = useState<Email[]>(emailList);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
 
-  const unreadCount = emailList.filter(email => !email.isRead).length;
-  const importantCount = emailList.filter(email => email.isImportant).length;
-  const [selectedEmail, setSelectedEmail] = useState<Email | undefined>(undefined);
+  useEffect(() => {
+    setEmails(emailList);
+  }, [emailList]);
+
+  const unreadCount = useMemo(() => emails.filter(e => !e.isRead).length, [emails]);
+  const importantCount = useMemo(() => emails.filter(e => e.isImportant).length, [emails]);
 
   const filteredEmails = useMemo(() => {
-    let filtered = emailList;
+    let filtered = emails;
 
     switch (filter) {
-      case 'inbox':
-        filtered = emailList;
-        break;
       case 'important':
-        filtered = emailList.filter(email => email.isImportant);
+        filtered = filtered.filter(e => e.isImportant);
         break;
       case 'sent':
-        filtered = emailList.filter(email => email.direction === 'outgoing');
+        filtered = filtered.filter(e => e.direction === 'outgoing');
         break;
+      case 'inbox':
       default:
-        filtered = emailList;
+        filtered = filtered.filter(e => e.direction === 'incoming');
+        break;
     }
 
     if (searchTerm.trim()) {
       const lower = searchTerm.toLowerCase();
-      filtered = filtered.filter(email =>
-        email.subject.toLowerCase().includes(lower) ||
-        email.to?.toLowerCase().includes(lower) ||
-        email.cc?.toLowerCase().includes(lower) ||
-        email.bcc?.toLowerCase().includes(lower) ||
-        email.content?.toLowerCase().includes(lower)
+      filtered = filtered.filter(
+        e =>
+          e.subject.toLowerCase().includes(lower) ||
+          e.to?.toLowerCase().includes(lower) ||
+          e.cc?.toLowerCase().includes(lower) ||
+          e.bcc?.toLowerCase().includes(lower) ||
+          e.content?.toLowerCase().includes(lower)
       );
     }
 
     return filtered;
-  }, [emailList, filter, searchTerm]);
-
-  const [emails, setEmails] = useState<Email[]>(filteredEmails);
-  useEffect(() => {
-    setEmails(filteredEmails);
-  }, [filteredEmails]);
+  }, [emails, filter, searchTerm]);
 
   const debouncedSearch = useMemo(
     () =>
@@ -78,20 +77,15 @@ export default function ClientPage(props: ClientPageProps) {
   };
 
   const onEmailClickHandler = async (emailId: number) => {
-    let selected: Email | undefined;
+    const updatedEmails = emails.map(e =>
+      e.id === emailId ? { ...e, isRead: true } : e
+    );
+
+    setEmails(updatedEmails);
+
+    const clickedEmail = updatedEmails.find(e => e.id === emailId) ?? null;
+    setSelectedEmail(clickedEmail);
     await markEmailAsRead(emailId);
-
-    const updated = emails.map(e => {
-      if (e.id === emailId) {
-        selected = { ...e, isRead: true };
-        return selected;
-      }
-      return e;
-    });
-
-    setEmails(updated);
-
-    setSelectedEmail(selected);
   };
 
   return (
@@ -110,27 +104,10 @@ export default function ClientPage(props: ClientPageProps) {
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
             Inbox
           </Typography>
-
-          {/* Stats */}
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-            <Chip
-              label={`${emailList.length} Total`}
-              size="small"
-              color="primary"
-              variant="outlined"
-            />
-            <Chip
-              label={`${unreadCount} Unread`}
-              size="small"
-              color="warning"
-              variant="outlined"
-            />
-            <Chip
-              label={`${importantCount} Important`}
-              size="small"
-              color="secondary"
-              variant="outlined"
-            />
+            <Chip label={`${emails.length} Total`} size="small" color="primary" variant="outlined" />
+            <Chip label={`${unreadCount} Unread`} size="small" color="warning" variant="outlined" />
+            <Chip label={`${importantCount} Important`} size="small" color="secondary" variant="outlined" />
           </Box>
         </Box>
 
@@ -150,23 +127,19 @@ export default function ClientPage(props: ClientPageProps) {
                 </InputAdornment>
               ),
             }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: 'background.default',
-              },
-            }}
+            sx={{ '& .MuiOutlinedInput-root': { backgroundColor: 'background.default' } }}
           />
         </Box>
 
         {/* Email List - Scrollable */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 1 }} data-testid="email-list">
-          {emails.length === 0 ? (
+          {filteredEmails.length === 0 ? (
             <Typography variant="body2" color="text.secondary" sx={{ p: 3, textAlign: 'center' }}>
               No emails found in {filter}.
             </Typography>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {emails.map((email) => (
+              {filteredEmails.map(email => (
                 <EmailCard
                   key={email.id}
                   email={email}
