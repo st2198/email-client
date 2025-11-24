@@ -33,8 +33,8 @@ export default function ClientPage(props: ClientPageProps) {
 
     const updated = emails.map(e => {
       if (e.id === emailId) {
-        selected = { ...e };
-        return { ...e, isRead: true };
+        selected = { ...e, isRead: true };
+        return selected;
       }
       return e;
     });
