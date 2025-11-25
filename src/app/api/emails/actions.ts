@@ -57,14 +57,17 @@ export const getAllEmails = async (search: string | null): Promise<Email[]> => {
 
   const lowerSearch = `%${search.toLowerCase()}%`;
 
-  return await db.select().from(emails).where(
-    or(
-      like(emails.subject, lowerSearch),
-      like(emails.to, lowerSearch),
-      like(emails.cc, lowerSearch),
-      like(emails.bcc, lowerSearch),
-      like(emails.content, lowerSearch)
-    )
-  );
+  return await db
+    .select()
+    .from(emails)
+    .where(
+      or(
+        like(emails.subject, lowerSearch),
+        like(emails.to, lowerSearch),
+        like(emails.cc, lowerSearch),
+        like(emails.bcc, lowerSearch),
+        like(emails.content, lowerSearch)
+      )
+    ).orderBy(desc(emails.createdAt))
 };
 
