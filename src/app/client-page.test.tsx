@@ -16,6 +16,10 @@ const renderComponent = (emailList: Email[]) =>
     </ComposeProvider>
   );
 
+jest.mock('@/services/emailService', () => ({
+  markEmailAsRead: jest.fn(), // returns a mock function that does nothing
+}));
+
 describe('Home Page Client', () => {
   test('Shows the email list in the inbox', async () => {
     const emailList = await db.select().from(emails).orderBy((email) => desc(email.createdAt));

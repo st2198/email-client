@@ -60,7 +60,6 @@ export default function ComposeEmail({ open, onClose }: ComposeEmailProps) {
       setShowCc(false);
       setShowBcc(false);
     } catch (err) {
-      console.error(err);
       setSnackMessage("Failed to send email");
       setSnackOpen(true);
     } finally {

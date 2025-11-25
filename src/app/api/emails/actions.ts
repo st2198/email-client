@@ -1,5 +1,5 @@
 "use server";
-import { eq, or, like, desc } from "drizzle-orm";
+import { eq, or, like, desc, sql } from "drizzle-orm";
 import { db } from '@/lib/database';
 import { EmailDirection, emails, Email } from '@/lib/schema';
 
@@ -51,23 +51,65 @@ export const markEmailAsRead = async (id: number) => {
 }
 
 export const getAllEmails = async (search: string | null): Promise<Email[]> => {
-  if (!search) {
-    return await db.select().from(emails).orderBy(desc(emails.createdAt));
+  const latestEmailPerThread = db
+    .select({
+      id: emails.id,
+      threadId: emails.threadId,
+      subject: emails.subject,
+      from: emails.from,
+      to: emails.to,
+      content: emails.content,
+      isRead: emails.isRead,
+      isImportant: emails.isImportant,
+      direction: emails.direction,
+      createdAt: emails.createdAt,
+      updatedAt: emails.updatedAt,
+      cc: emails.cc,
+      bcc: emails.bcc,
+      // We need the max createdAt per thread to identify the latest email
+      maxCreatedAt: sql<number>`max(${emails.createdAt})`.as('max_created_at'),
+    })
+    .from(emails)
+    .groupBy(emails.threadId)
+    .as('latest_per_thread');
+
+  const query = db
+    .select({
+      id: emails.id,
+      threadId: emails.threadId,
+      subject: emails.subject,
+      from: emails.from,
+      to: emails.to,
+      content: emails.content,
+      isRead: emails.isRead,
+      isImportant: emails.isImportant,
+      direction: emails.direction,
+      createdAt: emails.createdAt,
+      updatedAt: emails.updatedAt,
+      cc: emails.cc,
+      bcc: emails.bcc,
+    })
+    .from(emails)
+    .innerJoin(
+      latestEmailPerThread,
+      sql`${emails.threadId} = ${latestEmailPerThread.threadId} AND ${emails.createdAt} = ${latestEmailPerThread.maxCreatedAt}`
+    );
+
+  if (search) {
+    const lowerSearch = `%${search.toLowerCase()}%`;
+    return await query
+      .where(
+        or(
+          like(sql`lower(${emails.subject})`, lowerSearch),
+          like(sql`lower(${emails.to})`, lowerSearch),
+          like(sql`lower(${emails.cc})`, lowerSearch),
+          like(sql`lower(${emails.bcc})`, lowerSearch),
+          like(sql`lower(${emails.content})`, lowerSearch),
+          like(sql`lower(${emails.from})`, lowerSearch) // optional: include sender in search
+        )
+      )
+      .orderBy(desc(emails.createdAt));
   }
 
-  const lowerSearch = `%${search.toLowerCase()}%`;
-
-  return await db
-    .select()
-    .from(emails)
-    .where(
-      or(
-        like(emails.subject, lowerSearch),
-        like(emails.to, lowerSearch),
-        like(emails.cc, lowerSearch),
-        like(emails.bcc, lowerSearch),
-        like(emails.content, lowerSearch)
-      )
-    ).orderBy(desc(emails.createdAt))
+  return await query.orderBy(desc(emails.createdAt));
 };
-
