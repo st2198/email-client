@@ -32,7 +32,7 @@ export async function sendEmail(input: NewEmailInput) {
     cc: input.cc || "",
     bcc: input.bcc || "",
     content: input.content,
-    isRead: false,
+    isRead: true,
     isImportant: false,
     direction: EmailDirection.OUTGOING,
   };
