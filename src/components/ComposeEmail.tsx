@@ -93,6 +93,7 @@ export default function ComposeEmail({ open, onClose }: ComposeEmailProps) {
                   <Typography
                     sx={{ cursor: "pointer", color: "primary.main", userSelect: "none" }}
                     onClick={() => setShowCc(true)}
+                    data-testid="compose-email-cc"
                   >
                     Cc
                   </Typography>
@@ -101,6 +102,7 @@ export default function ComposeEmail({ open, onClose }: ComposeEmailProps) {
                   <Typography
                     sx={{ cursor: "pointer", color: "primary.main", userSelect: "none" }}
                     onClick={() => setShowBcc(true)}
+                    data-testid="compose-email-bcc"
                   >
                     Bcc
                   </Typography>
